@@ -43,8 +43,8 @@ function LoadData() {
         ${item["Address"]}
         </div>
         </td>
-        <td id="edit_${index}"><button onclick="editRow(${index})">edit</button></td>
-        <td onclick="deleteRow(${index})"><button>delete</button></td>
+        <td id="edit_${index}"><button class="btn btn-secondary" onclick="editRow(${index})">edit</button></td>
+        <td ><button class="btn btn-danger" onclick="deleteRow(${index})">delete</button></td>
         </tr>`)
     })
     table.innerHTML = itemsToDisplay.join("");
@@ -77,7 +77,7 @@ function editRow(index) {
     email.innerHTML = `${email.innerHTML}<input type="text" value="${showemail.innerText.trim()}" onchnage="validateemail(${index})" id="input_email_${index}"></input>`;
     number.innerHTML = `${number.innerHTML}<input type="text" value="${shownumber.innerText.trim()}" id="input_number_${index}"></input>`;
     address.innerHTML = `${address.innerHTML}<input type="text" value="${showaddress.innerText.trim()}" id="input_address_${index}"></input>`;
-    editbtn.innerHTML = `<button onclick="save(${index})">Save</button><button onclick="cancel(${index})">Cancel</button>`;
+    editbtn.innerHTML = `<button class="btn btn-outline-success" onclick="save(${index})">Save</button><button class="btn btn-outline-warning" onclick="cancel(${index})">Cancel</button>`;
 
     //adding event to validate the input fields
     let inputelements = callElements(index, "input_"); 
@@ -105,7 +105,7 @@ function cancel(index) {
         });
         
     //getting back the edit button
-    document.getElementById(`edit_${index}`).innerHTML = `<button onclick="editRow(${index})">edit</button>`
+    document.getElementById(`edit_${index}`).innerHTML = `<button class="btn btn-secondary" onclick="editRow(${index})">edit</button>`
 }
 
 function save(index) {
@@ -142,7 +142,7 @@ function save(index) {
         resetnumber.innerHTML = number.value;
         resetaddress.innerHTML = address.value;
         //finally getting the edit button back
-        document.getElementById(`edit_${index}`).innerHTML = `<button onclick="editRow(${index})">edit</button>`
+        document.getElementById(`edit_${index}`).innerHTML = `<button class="btn btn-secondary" onclick="editRow(${index})">edit</button>`
     // }
     
 }
