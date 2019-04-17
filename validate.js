@@ -9,7 +9,6 @@ function validateform(index) {
 }
 
 function validate(e) {
-    console.log(e)
     if(/email/gi.test(e.target.id)) {
         let email = document.getElementById(e.target.id);
         if(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.value)) {
