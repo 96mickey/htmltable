@@ -8,10 +8,10 @@ function validateform(index) {
 
 }
 
-function validate(index, type) {
-    switch (type) {
-        case "email":
-        let email = document.getElementById(`input_email_${index}`);
+function validate(e) {
+    console.log(e)
+    if(/email/gi.test(e.target.id)) {
+        let email = document.getElementById(e.target.id);
         if(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.value)) {
             email.classList.remove("error")
             return true;}
@@ -19,8 +19,8 @@ function validate(index, type) {
             email.classList.add("error");
             return false;
         };
-        case "address":
-        let address = document.getElementById(`input_address_${index}`);
+    } else if(/address/gi.test(e.target.id)) {
+        let address = document.getElementById(e.target.id);
         if(!address.value || address.value.trim() === "") {address.classList.add("error")
             return false;
         }
@@ -28,8 +28,8 @@ function validate(index, type) {
             address.classList.remove("error");
             return true
         };
-        case "number":
-        let number = document.getElementById(`input_number_${index}`);
+    } else if(/number/gi.test(e.target.id)) {
+        let number = document.getElementById(e.target.id);
         if(!number.value || isNaN(number.value)) {number.classList.add("error")
             return false;
         }
@@ -37,8 +37,8 @@ function validate(index, type) {
             number.classList.remove("error");
             return true
         };
-        case "fname": 
-        let fname = document.getElementById(`input_fname_${index}`);
+    } else if(/fname/gi.test(e.target.id)) {
+        let fname = document.getElementById(e.target.id);
         if(!fname.value || fname.value.trim() === "") {fname.classList.add("error")
             return false
         } 
@@ -46,8 +46,8 @@ function validate(index, type) {
             fname.classList.remove("error");
             return true
         };
-        case "lname":
-        let lname = document.getElementById(`input_lname_${index}`);
+    }   else if(/lname/gi.test(e.target.id)) {
+        let lname = document.getElementById(e.target.id);
         if(!lname.value || lname.value.trim() === "") {lname.classList.add("error") 
             return false;
         }
@@ -55,7 +55,10 @@ function validate(index, type) {
             lname.classList.remove("error");
             return true
         };
-        default:
-        return false
     }
 }
+
+// function escapeRegex(text) {
+//     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+//   }
+

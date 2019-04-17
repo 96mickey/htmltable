@@ -69,13 +69,6 @@ function editRow(index) {
     Object.entries(elementsToHide).forEach(entry => {
         entry[1].classList.add("hide");
         });
-    
-    //adding event to validate the input fields
-    fname.addEventListener("input", () => validate(index, "fname"))
-    lname.addEventListener("input", () => validate(index, "lname"))
-    email.addEventListener("input", () => validate(index, "email"))
-    number.addEventListener("input", () => validate(index, "number"))
-    address.addEventListener("input", () => validate(index, "address"))
 
     //changing the row to input fields. setting up the initial value
     fname.innerHTML = `${fname.innerHTML} <input type="text" value="${showfname.innerText.trim()}" id="input_fname_${index}"></input>`;
@@ -86,25 +79,24 @@ function editRow(index) {
     address.innerHTML = `${address.innerHTML}<input type="text" value="${showaddress.innerText.trim()}" id="input_address_${index}"></input>`;
     editbtn.innerHTML = `<button onclick="save(${index})">Save</button><button onclick="cancel(${index})">Cancel</button>`;
 
+    //adding event to validate the input fields
+    let inputelements = callElements(index, "input_"); 
+    let {fname:inputfname, lname:inputlname, email:inputemail, number:inputnumber, address:inputaddress} = inputelements;
+    inputfname.addEventListener("input", validate)
+    inputlname.addEventListener("input", validate)
+    inputemail.addEventListener("input", validate)
+    inputnumber.addEventListener("input", validate)
+    inputaddress.addEventListener("input", validate)
 }
 
 function cancel(index) {
     let cancelVal = callElements(index, "input_");
-        let {
-            fname: input_fname,
-            lname: input_lname, 
-            mname: input_mname, 
-            email: input_email, 
-            number: input_number, 
-            address: input_address
-        } = cancelVal;
-    // removing input fields
-    input_fname.parentNode.removeChild(input_fname);
-    input_lname.parentNode.removeChild(input_lname);
-    input_mname.parentNode.removeChild(input_mname);
-    input_number.parentNode.removeChild(input_number);
-    input_email.parentNode.removeChild(input_email);
-    input_address.parentNode.removeChild(input_address);
+
+    //removing event listeners
+    Object.entries(cancelVal).forEach(entry => {
+        entry[1].removeEventListener("input", validate)
+        entry[1].parentNode.removeChild(entry[1]);
+        });
     
     //removing hide class (to see the actual content)
     let removeHideClass = callElements(index, "value_");
@@ -117,14 +109,15 @@ function cancel(index) {
 }
 
 function save(index) {
-    if(validateform(index)) {
-        alert("Check the values in the form.")
-    } else {
+    // if(validateform(index)) {
+    //     alert("Check the values in the form.")
+    // } else {
         let elements = callElements(index, "input_");
         let {fname, mname, lname, email, number, address} = elements;
         
         //removing input fields
         Object.entries(elements).forEach(entry => {
+            entry[1].removeEventListener("input", validate)
             entry[1].parentNode.removeChild(entry[1]);
             });
         //getting back the hidden data
@@ -149,8 +142,8 @@ function save(index) {
         resetnumber.innerHTML = number.value;
         resetaddress.innerHTML = address.value;
         //finally getting the edit button back
-        document.getElementById(`edit_${index}`).innerHTML = `<button onclick="editRow(${index})">Edit</button>`
-    }
+        document.getElementById(`edit_${index}`).innerHTML = `<button onclick="editRow(${index})">edit</button>`
+    // }
     
 }
 
