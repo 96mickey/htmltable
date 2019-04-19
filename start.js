@@ -1,16 +1,122 @@
-
-let body = document.body
 let button = document.getElementById("changeColor");
 let table = document.getElementById("tablebody");
-button.onclick = LoadData;
 
-function refreshData() {
-    LoadData();
+var refreshData = () => {
+    loadData();
 }
 
-function LoadData() {
+var loadData = () => {
     //setting up the basic view
     let items = [...data];
+
+    let itemsToDisplay = makeLayout(items);
+    
+    table.innerHTML = itemsToDisplay.join("");
+    button.value = "Refresh data"
+    button.onclick = refreshData;
+}
+
+button.onclick = loadData;
+
+var deleteRow = index => {
+    let row = document.getElementById(`row_${index}`);
+    row.parentNode.removeChild(row);
+}
+
+var editRow = index => {
+    let elements = callElements(index, ""); 
+    let {fname, mname, lname, email, number, address} = elements;
+
+    let editbtn = document.getElementById(`edit_${index}`);
+
+    //hiding the elements of the table
+    //and changing the row to input fields. setting up the initial value
+    //and adding event to validate the input fields
+    let regex = /\_(.*?)\_/;
+    Object.entries(elements).forEach(entry => {
+        entry[1].children[0].classList.add("hide");
+        let strforclass = regex.exec(entry[1].children[0].id)
+        entry[1].innerHTML = `${entry[1].innerHTML} <input type="text" value="${entry[1].children[0].innerText.trim()}" id="input_${strforclass[1]}_${index}"></input>`;
+        entry[1].children[1].addEventListener("input", validate)
+    });
+
+    //changing the button
+    editbtn.innerHTML = `<button class="btn btn-outline-success" onclick="save(${index})">Save</button><button class="btn btn-outline-warning" onclick="cancel(${index})">Cancel</button>`;
+}
+
+var cancel = index => {
+    let cancelVal = callElements(index, "input_");
+
+    //removing event listeners
+    Object.entries(cancelVal).forEach(entry => {
+        entry[1].removeEventListener("input", validate)
+        entry[1].parentNode.removeChild(entry[1]);
+        });
+    
+    //removing hide class (to see the actual content)
+    let removeHideClass = callElements(index, "value_");
+    Object.entries(removeHideClass).forEach(entry => {
+        entry[1].classList.remove("hide");
+        });
+        
+    //getting back the edit button
+    document.getElementById(`edit_${index}`).innerHTML = `<button class="btn btn-secondary" onclick="editRow(${index})">edit</button>`
+}
+
+var save = index => {
+    // if(validateform(index)) {
+    //     alert("Check the values in the form.")
+    // } else {
+        let elements = callElements(index, "input_");
+        let {fname, mname, lname, email, number, address} = elements;
+        
+        //removing input fields and event listeners
+        Object.entries(elements).forEach(entry => {
+            console.log(entry[1])
+            entry[1].removeEventListener("input", validate)
+            entry[1].parentNode.removeChild(entry[1]);
+            });
+        //getting back the hidden data
+        let removeHideClass = callElements(index, "value_");
+        Object.entries(removeHideClass).forEach(entry => {
+            entry[1].classList.remove("hide");
+            });
+
+            let {
+                    fname: resetfname,
+                    lname: resetlname, 
+                    mname: resetmname, 
+                    email: resetemail, 
+                    number: resetnumber, 
+                    address: resetaddress
+                } = removeHideClass;
+        //replacing the value with new values on save
+        resetfname.innerHTML = fname.value;
+        resetlname.innerHTML = lname.value;
+        resetmname.innerHTML = mname.value;
+        resetemail.innerHTML = email.value;
+        resetnumber.innerHTML = number.value;
+        resetaddress.innerHTML = address.value;
+        //finally getting the edit button back
+        document.getElementById(`edit_${index}`).innerHTML = `<button class="btn btn-secondary" onclick="editRow(${index})">edit</button>`
+    // }
+    
+}
+
+//general way for selecting elements to iterate over
+var callElements = (index, classprefix) => {
+    let obj = {}
+    obj.fname = document.getElementById(`${classprefix}fname_${index}`);
+    obj.lname = document.getElementById(`${classprefix}lname_${index}`);
+    obj.mname = document.getElementById(`${classprefix}mname_${index}`);
+    obj.email = document.getElementById(`${classprefix}email_${index}`);
+    obj.address = document.getElementById(`${classprefix}address_${index}`);
+    obj.number = document.getElementById(`${classprefix}number_${index}`);
+
+    return obj;
+}
+
+var makeLayout = items => {
     let itemsToDisplay = items.map((item, index) => {
         return (`<tr key=${index} id="row_${index}">
         <td id="fname_${index}">
@@ -47,118 +153,9 @@ function LoadData() {
         <td ><button class="btn btn-danger" onclick="deleteRow(${index})">delete</button></td>
         </tr>`)
     })
-    table.innerHTML = itemsToDisplay.join("");
-    button.value = "Refresh data"
-    button.onclick = refreshData;
-}
 
-function deleteRow(index) {
-    let row = document.getElementById(`row_${index}`);
-    row.parentNode.removeChild(row);
-}
-
-function editRow(index) {
-    let elements = callElements(index, ""); 
-    let {fname, mname, lname, email, number, address} = elements;
-
-    let editbtn = document.getElementById(`edit_${index}`);
-
-    let elementsToHide = callElements(index, "value_");
-    let {fname:showfname, lname:showlname, mname:showmname, email:showemail, number:shownumber, address:showaddress} = elementsToHide;
-    //hiding the elements of the table
-    Object.entries(elementsToHide).forEach(entry => {
-        entry[1].classList.add("hide");
-        });
-
-    //changing the row to input fields. setting up the initial value
-    fname.innerHTML = `${fname.innerHTML} <input type="text" value="${showfname.innerText.trim()}" id="input_fname_${index}"></input>`;
-    lname.innerHTML = `${lname.innerHTML}<input type="text" value="${showlname.innerText.trim()}" id="input_lname_${index}"></input>`;
-    mname.innerHTML = `${mname.innerHTML}<input type="text" value="${showmname.innerText.trim()}" id="input_mname_${index}"></input>`;
-    email.innerHTML = `${email.innerHTML}<input type="text" value="${showemail.innerText.trim()}" onchnage="validateemail(${index})" id="input_email_${index}"></input>`;
-    number.innerHTML = `${number.innerHTML}<input type="text" value="${shownumber.innerText.trim()}" id="input_number_${index}"></input>`;
-    address.innerHTML = `${address.innerHTML}<input type="text" value="${showaddress.innerText.trim()}" id="input_address_${index}"></input>`;
-    editbtn.innerHTML = `<button class="btn btn-outline-success" onclick="save(${index})">Save</button><button class="btn btn-outline-warning" onclick="cancel(${index})">Cancel</button>`;
-
-    //adding event to validate the input fields
-    let inputelements = callElements(index, "input_"); 
-    let {fname:inputfname, lname:inputlname, email:inputemail, number:inputnumber, address:inputaddress} = inputelements;
-    inputfname.addEventListener("input", validate)
-    inputlname.addEventListener("input", validate)
-    inputemail.addEventListener("input", validate)
-    inputnumber.addEventListener("input", validate)
-    inputaddress.addEventListener("input", validate)
-}
-
-function cancel(index) {
-    let cancelVal = callElements(index, "input_");
-
-    //removing event listeners
-    Object.entries(cancelVal).forEach(entry => {
-        entry[1].removeEventListener("input", validate)
-        entry[1].parentNode.removeChild(entry[1]);
-        });
-    
-    //removing hide class (to see the actual content)
-    let removeHideClass = callElements(index, "value_");
-    Object.entries(removeHideClass).forEach(entry => {
-        entry[1].classList.remove("hide");
-        });
-        
-    //getting back the edit button
-    document.getElementById(`edit_${index}`).innerHTML = `<button class="btn btn-secondary" onclick="editRow(${index})">edit</button>`
-}
-
-function save(index) {
-    // if(validateform(index)) {
-    //     alert("Check the values in the form.")
-    // } else {
-        let elements = callElements(index, "input_");
-        let {fname, mname, lname, email, number, address} = elements;
-        
-        //removing input fields
-        Object.entries(elements).forEach(entry => {
-            entry[1].removeEventListener("input", validate)
-            entry[1].parentNode.removeChild(entry[1]);
-            });
-        //getting back the hidden data
-        let removeHideClass = callElements(index, "value_");
-        Object.entries(removeHideClass).forEach(entry => {
-            entry[1].classList.remove("hide");
-            });
-
-            let {
-                    fname: resetfname,
-                    lname: resetlname, 
-                    mname: resetmname, 
-                    email: resetemail, 
-                    number: resetnumber, 
-                    address: resetaddress
-                } = removeHideClass;
-        //replacing the value with new values on save
-        resetfname.innerHTML = fname.value;
-        resetlname.innerHTML = lname.value;
-        resetmname.innerHTML = mname.value;
-        resetemail.innerHTML = email.value;
-        resetnumber.innerHTML = number.value;
-        resetaddress.innerHTML = address.value;
-        //finally getting the edit button back
-        document.getElementById(`edit_${index}`).innerHTML = `<button class="btn btn-secondary" onclick="editRow(${index})">edit</button>`
-    // }
-    
-}
-
-//general way for selecting elements to iterate over
-function callElements(index, str) {
-    let obj = {}
-    obj.fname = document.getElementById(`${str}fname_${index}`);
-    obj.lname = document.getElementById(`${str}lname_${index}`);
-    obj.mname = document.getElementById(`${str}mname_${index}`);
-    obj.email = document.getElementById(`${str}email_${index}`);
-    obj.address = document.getElementById(`${str}address_${index}`);
-    obj.number = document.getElementById(`${str}number_${index}`);
-
-    return obj;
-}
+    return itemsToDisplay;
+} 
 
 
 
