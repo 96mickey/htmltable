@@ -1,10 +1,6 @@
 let button = document.getElementById("changeColor");
 let table = document.getElementById("tablebody");
 
-var refreshData = () => {
-  loadData();
-};
-
 var loadData = () => {
   //setting up the basic view
   let items = [...data];
@@ -13,7 +9,7 @@ var loadData = () => {
 
   table.innerHTML = itemsToDisplay.join("");
   button.value = "Refresh data";
-  button.onclick = refreshData;
+  button.onclick = loadData;
 };
 
 button.onclick = loadData;
@@ -33,11 +29,16 @@ var editRow = index => {
   //and adding event to validate the input fields
   let regex = /\_(.*?)\_/;
   Object.entries(elements).forEach(entry => {
+    let type;
+    if (/email/gi.test(entry[1].id)) {
+      type = "email";
+    } else if (/number/gi.test(entry[1].id)) type = "number";
+    else type = "text";
     entry[1].children[0].classList.add("hide");
     let strforclass = regex.exec(entry[1].children[0].id);
     entry[1].innerHTML = `${
       entry[1].innerHTML
-    } <input type="text" value="${entry[1].children[0].innerText.trim()}" id="input_${
+    } <input type=${type} value="${entry[1].children[0].innerText.trim()}" id="input_${
       strforclass[1]
     }_${index}"></input>`;
     entry[1].children[1].addEventListener("input", validate);
@@ -77,7 +78,6 @@ var save = index => {
 
   //removing input fields and event listeners
   Object.entries(elements).forEach(entry => {
-    console.log(entry[1]);
     entry[1].removeEventListener("input", validate);
     entry[1].parentNode.removeChild(entry[1]);
   });
